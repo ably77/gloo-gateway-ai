@@ -1,6 +1,9 @@
 # gloo-gateway-ai
 
-# curl the OpenAPI LLM Directly
+## curl the OpenAPI LLM Directly
+
+Description: curl the OpenAPI LLM directly, passing in the appropriate headers and body for the request
+
 ```bash
 curl https://api.openai.com/v1/chat/completions   -H "Content-Type: application/json"   -H "Authorization: Bearer $OPENAI_API_KEY"   -d '{
     "model": "gpt-3.5-turbo",
@@ -44,7 +47,10 @@ Output:
 }
 ```
 
-# curl the OpenAPI LLM through Gloo Gateway
+## Configure an AI Proxy using Gloo Gateway
+
+Description: curl the OpenAPI LLM External Service through Gloo Gateway, creating one egress point for AI that can be extended to consume any public or self-hosted LLM and control, secure, and observe AI requests going through the gateway. curl the Gloo Gateway route, passing in the appropriate headers and body for the request
+
 ```bash
 apiVersion: networking.gloo.solo.io/v2
 kind: RouteTable
@@ -137,7 +143,10 @@ output:
 }
 ```
 
-# Configure ELI5 Prompt Template
+## Configure ELI5 Prompt Template
+
+Description: Configure a Gloo Gateway Transformation Policy that controls the system and user prompts, taking inputs using custom headers. The following ELI5 template uses the `x-api-key`, `x-model`, and `x-prompt` headers to explain a topic like a 5 year old. Configure an additional route for the ELI5 prompt template to configure the request to the LLM based on these specific headers. Additionally this route is matched on the header `x-llm: openai` in order to route this request to the openai API, the use of this header can be extended to other LLMs and their destinations.
+
 ```bash
 apiVersion: trafficcontrol.policy.gloo.solo.io/v2
 kind: TransformationPolicy
@@ -185,7 +194,7 @@ spec:
             regex: '.*'
 ```
  
-# Configure RouteTable for ELI5 Prompt Template Route
+# Configure RouteTable for ELI5 Prompt Template Route for OpenAI
 ```bash
 apiVersion: networking.gloo.solo.io/v2
 kind: RouteTable
@@ -275,6 +284,9 @@ output:
 ```
 
 # Configure freeform input prompt template
+
+Description: Configure a Gloo Gateway Transformation Policy that controls the system and user prompts, taking inputs using custom headers. The following freeform template uses the `x-api-key`, `x-model`, `x-user-prompt`, and `x-system-prompt` headers to take on a custom role and prompt. Configure an additional route for the freeform prompt template to configure the request to the LLM based on these specific headers. Additionally this route is matched on the header `x-llm: openai` in order to route this request to the openai API, the use of this header can be extended to other LLMs and their destinations.
+
 ```bash
 apiVersion: trafficcontrol.policy.gloo.solo.io/v2
 kind: TransformationPolicy
@@ -437,6 +449,9 @@ output:
 ```
 
 # Configure language translator prompt template
+
+Description: Configure a Gloo Gateway Transformation Policy that controls the system and user prompts, taking inputs using custom headers. The following ELI5 template uses the `x-api-key`, `x-model`, `x-language`, and `x-prompt` headers to translate an input prompt into any language. Configure an additional route for the ELI5 prompt template to configure the request to the LLM based on these specific headers. Additionally this route is matched on the header `x-llm: openai` in order to route this request to the openai API, the use of this header can be extended to other LLMs and their destinations.
+
 ```bash
 apiVersion: trafficcontrol.policy.gloo.solo.io/v2
 kind: TransformationPolicy
