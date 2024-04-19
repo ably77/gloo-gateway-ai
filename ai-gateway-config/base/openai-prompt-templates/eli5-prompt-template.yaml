@@ -14,6 +14,7 @@ spec:
         headers:
           Authorization:
             text: 'Bearer {{ api_key}}'
+        # input prompt template
         body:
           text: |
             {
@@ -30,15 +31,15 @@ spec:
               ]
             }
         extractors:
-          # extracts an x-api-key header for the Authorization: Bearer <token>
+          # extracts an x-api-key header var
           api_key:
             header: 'x-api-key'
             regex: '.*'
-          # extracts x-model header for the body input
+          # extracts x-model header var
           llm_model:
             header: 'x-model'
             regex: '.*'
-          # extracts x-prompt header for body input
+          # extracts x-prompt header var
           prompt:
             header: 'x-prompt'
             regex: '.*'

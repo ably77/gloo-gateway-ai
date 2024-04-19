@@ -11,9 +11,11 @@ spec:
   config:
     request:
       injaTemplate:
+        # if x-api-key header is present, append variable as a query param, else route to original path
         headers:
-          Authorization:
-            text: 'Bearer {{ api_key}}'
+          :path:
+            text: '{% if header("x-api-key") != "" %}/gemini?key={{ api_key }}{% else %}{{ original_path }}{% endif %}'
+        # input prompt template
         body:
           text: |
             {
@@ -30,19 +32,23 @@ spec:
               ]
             }
         extractors:
-          # extracts an x-api-key header for the Authorization: Bearer <token>
+          # extracts an x-api-key header var
           api_key:
             header: 'x-api-key'
             regex: '.*'
-          # extracts x-model header for the model body input
+          # extracts x-model header var
           llm_model:
             header: 'x-model'
             regex: '.*'
-          # extracts x-system-prompt header for the body input
+          # extracts x-system-prompt header var
           system_prompt:
             header: 'x-system-prompt'
             regex: '.*'
-          # extracts x-system-prompt header for the body input
+          # extracts x-system-prompt header var
           user_prompt:
             header: 'x-user-prompt'
+            regex: '.*'
+          # extracts pseudo-path header var
+          original_path:
+            header: ':path'
             regex: '.*'

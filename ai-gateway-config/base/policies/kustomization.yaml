@@ -6,4 +6,5 @@ kind: Kustomization
 resources:
 #- extauthpolicy.yaml
 - openai-gateway-api-key-auth.yaml
+- gemini-gateway-api-key-auth.yaml
 #- api-key-secret.yaml
