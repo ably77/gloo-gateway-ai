@@ -370,6 +370,8 @@ spec:
             prompt-template: "none"
       sortMethod: ROUTE_SPECIFICITY
   - name: gemini-catchall
+    labels:
+      security: gemini
     delegate:
       routeTables:
         # Selects tables based on name
@@ -810,6 +812,8 @@ spec:
             prompt-template: "none"
       sortMethod: ROUTE_SPECIFICITY
   - name: gemini-catchall
+    labels:
+      security: gemini
     delegate:
       routeTables:
         # Selects tables based on name
@@ -1020,6 +1024,8 @@ spec:
             prompt-template: "none"
       sortMethod: ROUTE_SPECIFICITY
   - name: gemini-catchall
+    labels:
+      security: gemini
     delegate:
       routeTables:
         # Selects tables based on name
@@ -1064,8 +1070,6 @@ output:
   "system_fingerprint": "fp_c2295e73ad"
 }
 ```
-
-
 
 
 #### ELI5 Gemini Prompt Template
@@ -1205,6 +1209,7 @@ spec:
   - name: gemini-eli5
     labels:
       prompt-template: gemini-eli5
+      security: gemini
     delegate:
       routeTables:
         # Selects tables based on name
@@ -1216,6 +1221,8 @@ spec:
             prompt-template: "gemini-eli5"
       sortMethod: ROUTE_SPECIFICITY
   - name: gemini-catchall
+    labels:
+      security: gemini
     delegate:
       routeTables:
         # Selects tables based on name
@@ -1272,7 +1279,91 @@ output:
 }
 ```
 
+#### Gemini Query Parameter API Key Substitution
 
+Description: Gemini expects an API key to be provided as a query parameter whe using curl. In this use case, we will configure a Gloo Gateway Transformation Policy that uses the `x-api-key` as a variable and substitutes it as a path query parameter, else route to original path if the header is not present
+
+We can do this by extracting the `original_path` var from the pseudo-path header along with adding the following config to our existing Transformation Policy to manipulate the request path
+```bash
+request:
+  injaTemplate:
+    # if x-api-key header is present, append variable as a query param, else route to original path
+    headers:
+      :path:
+        text: '{% if header("x-api-key") != "" %}/gemini?key={{ api_key }}{% else %}{{ original_path }}{% endif %}'
+```
+
+Lets apply it
+```bash
+kubectl apply -f- <<EOF
+apiVersion: trafficcontrol.policy.gloo.solo.io/v2
+kind: TransformationPolicy
+metadata:
+  name: gemini-eli5-template-transformation
+  namespace: ai-gateway-ws-config
+spec:
+  applyToRoutes:
+  - route:
+      labels:
+        prompt-template: "gemini-eli5"
+  config:
+    request:
+      injaTemplate:
+        # if x-api-key header is present, append variable as a query param, else route to original path
+        headers:
+          :path:
+            text: '{% if header("x-api-key") != "" %}/gemini?key={{ api_key }}{% else %}{{ original_path }}{% endif %}'
+        # input prompt template
+        body:
+          text: |
+            {
+              "contents": [
+                {
+                  "role": "user",
+                  "parts": [
+                    {
+                      "text": "Explain like you are 5 years old"
+                    }
+                  ]
+                },
+                {
+                  "role": "model",
+                  "parts": [
+                    {
+                      "text": "Sure I can explain any topic to you as if you were 5 years old, what would you like me to explain?"
+                    }
+                  ]
+                },
+                {
+                  "role": "user",
+                  "parts": [
+                    {
+                      "text": "{{ prompt }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        extractors:
+          # extracts x-prompt header var
+          prompt:
+            header: 'x-prompt'
+            regex: '.*'
+          # extracts x-api-key header var
+          api_key:
+            header: 'x-api-key'
+            regex: '.*'
+          # extracts pseudo-path header var
+          original_path:
+            header: ':path'
+            regex: '.*'
+EOF
+```
+
+Now you should be able to curl the `/gemini` endpoint with the `x-api-key` header instead of a query path parameter. Don't worry though, the conditional logic that we implemented allows the user to provide the API key using either method!
+```bash
+curl -X POST "https://ai-gateway.demo.glooplatform.com/gemini" -H 'x-template: eli5' -H 'x-prompt: star wars' -H 'x-api-key: AIzaSyBUCojcwzn9UPUF2T93f3W7Ukx_iEOU0V4' -H 'Content-Type: application/json'
+```
 
 #### Language Translator Gemini Prompt Template
 
@@ -1293,6 +1384,11 @@ spec:
   config:
     request:
       injaTemplate:
+        # if x-api-key header is present, append variable as a query param, else route to original path
+        headers:
+          :path:
+            text: '{% if header("x-api-key") != "" %}/gemini?key={{ api_key }}{% else %}{{ original_path }}{% endif %}'
+        # input prompt template
         body:
           text: |
             {
@@ -1324,13 +1420,21 @@ spec:
               ]
             }
         extractors:
-          # extracts x-language header for the system prompt input
+          # extracts x-language header var
           language:
             header: 'x-language'
             regex: '.*'
-          # extracts x-prompt header for the user prompt input
+          # extracts x-prompt header var
           prompt:
             header: 'x-prompt'
+            regex: '.*'
+          # extracts x-api-key header var
+          api_key:
+            header: 'x-api-key'
+            regex: '.*'
+          # extracts pseudo-path header var
+          original_path:
+            header: ':path'
             regex: '.*'
 EOF
 ```
@@ -1445,7 +1549,7 @@ spec:
   - name: gemini-eli5
     labels:
       prompt-template: gemini-eli5
-      llm-type: gemini
+      security: gemini
     delegate:
       routeTables:
         # Selects tables based on name
@@ -1459,6 +1563,7 @@ spec:
   - name: gemini-translator
     labels:
       prompt-template: gemini-translator
+      security: gemini
     delegate:
       routeTables:
         # Selects tables based on name
@@ -1471,6 +1576,8 @@ spec:
       # Delegates based on order of weights
       sortMethod: ROUTE_SPECIFICITY
   - name: gemini-catchall
+    labels:
+      security: gemini
     delegate:
       routeTables:
         # Selects tables based on name
@@ -1486,7 +1593,7 @@ EOF
 
 input:
 ```bash
-curl -X POST "https://ai-gateway.demo.glooplatform.com/gemini?key=$GEMINI_API_KEY" -H 'x-template: translator' -H 'x-prompt: hello today i am here to speak about service mesh' -H 'x-language: thai' -H 'Content-Type: application/json'
+curl -X POST "https://ai-gateway.demo.glooplatform.com/gemini" -H 'x-template: translator' -H 'x-prompt: hello today i am here to speak about service mesh' -H 'x-language: thai' -H 'x-api-key: AIzaSyBUCojcwzn9UPUF2T93f3W7Ukx_iEOU0V4' -H 'Content-Type: application/json'
 ```
 
 output:
@@ -1547,10 +1654,11 @@ data:
   # derived from the command 'echo -n solo.io | base64'
   api-key: c29sby5pbw==
   openai-api-key: <base64-encoded-value> # base64 encoded value of the OpenAI API key
+  gemini-api-key <base64-encoded-value> # base64 encoded value of the Gemini API key
 EOF
 ```
 
-Create an api-key ExtAuthPolicy that uses this secret
+Create an api-key ExtAuthPolicy that uses this secret for the OpenAI routes
 ```bash
 kubectl apply -f- <<EOF
 apiVersion: security.policy.gloo.solo.io/v2
@@ -1581,7 +1689,7 @@ spec:
 EOF
 ```
 
-Now you can curl the OpenAI routes that are labeled with `security: openai` to validate this use case. Instead of providing the `x-api-key: $OPENAI_API_KEY` header like before we can instead use `api-key: solo.io`
+Now you can curl the OpenAI routes that are labeled with `security: openai` to validate this use case. Instead of providing the `x-api-key: $OPENAI_API_KEY` header like before we can instead use `api-key: solo.io`. The ext auth server will handle forwarding the LLM API Key upon successful auth.
 ```bash
 curl -X POST https://ai-gateway.demo.glooplatform.com/openai -H 'x-template: eli5' -H 'x-prompt: star wars' -H 'api-key: solo.io' -H 'Content-Type: application/json'
 ```
@@ -1612,4 +1720,40 @@ output:
   },
   "system_fingerprint": "fp_d9767fc5b9"
 }
+```
+
+Create an api-key ExtAuthPolicy that uses this secret for the Gemini routes
+```bash
+kubectl apply -f- <<EOF
+apiVersion: security.policy.gloo.solo.io/v2
+kind: ExtAuthPolicy
+metadata:
+  name: gemini-gateway-api-key-auth
+  namespace: ai-gateway-ws-config
+spec:
+  applyToRoutes:
+  - route:
+      labels:
+        security: gemini
+  config:
+    server:
+      name: mgmt-ext-auth-server
+      namespace: gloo-mesh
+      cluster: mgmt
+    glooAuth:
+      configs:
+      - apiKeyAuth:
+          headerName: api-key
+          headersFromMetadataEntry:
+            x-api-key: 
+              name: gemini-api-key
+          k8sSecretApikeyStorage:
+            labelSelector:
+              api-key: ai-gateway
+EOF
+```
+
+Now you can curl the Gemini routes that are labeled with `security: gemini` to validate this use case. Instead of providing the `x-api-key: $OPENAI_API_KEY` header like before we can instead use `api-key: solo.io`. The ext auth server will handle forwarding the LLM API Key upon successful auth.
+```bash
+curl -X POST "https://ai-gateway.demo.glooplatform.com/gemini" -H 'x-template: translator' -H 'x-prompt: hello today i am here to speak about service mesh' -H 'x-language: thai' -H 'api-key: solo.io' -H 'Content-Type: application/json'
 ```
