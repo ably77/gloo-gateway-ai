@@ -4,8 +4,8 @@ In this blog we will use Gloo Gateway to create an AI API Gateway
 - AI Proxy - Unified endpoint for all apps, regardless of backend LLM
 - LLM Delegation - Separate LLM Routes by functionality and groups
 - Prompt Templates - Templatize your prompt format
-- Security - Protect your AI Gateway using api-key ExtAuth
-- Observability - Track your LLM API usage using the gateway
+- Query Parameter API Key Substitution - Normalize the way you access LLMs
+- Security - Secure your gateway and mask your LLM API key(s) using custom headers
 
 
 ### curl the OpenAPI LLM Directly
