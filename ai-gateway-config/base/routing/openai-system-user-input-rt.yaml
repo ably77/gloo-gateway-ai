@@ -12,7 +12,6 @@ spec:
       - uri:
           prefix: /openai
         headers:
-        - name: x-api-key
         - name: x-system-prompt
         - name: x-user-prompt
       forwardTo:

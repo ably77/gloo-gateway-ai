@@ -4,4 +4,6 @@ kind: Kustomization
 
 # list of resources to be Applied
 resources:
-- extauthpolicy.yaml
+#- extauthpolicy.yaml
+- openai-gateway-api-key-auth.yaml
+#- api-key-secret.yaml
