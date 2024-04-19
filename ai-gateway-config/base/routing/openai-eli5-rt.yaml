@@ -3,11 +3,12 @@ kind: RouteTable
 metadata:
   name: openai-eli5-rt
   namespace: ai-gateway-ws-config
+  labels:
+    llm-type: openai
+    prompt-template: "eli5"
 spec:
   http:
     - name: eli5-translator
-      labels:
-        prompt-template: "eli5"
       matchers:
       - uri:
           prefix: /openai

@@ -3,11 +3,12 @@ kind: RouteTable
 metadata:
   name: openai-language-transformer-rt
   namespace: ai-gateway-ws-config
+  labels:
+    llm-type: openai
+    prompt-template: "translator"
 spec:
   http:
     - name: language-translator
-      labels:
-        prompt-template: translator
       matchers:
       - uri:
           prefix: /openai

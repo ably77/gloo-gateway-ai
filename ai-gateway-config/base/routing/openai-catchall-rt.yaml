@@ -3,6 +3,9 @@ kind: RouteTable
 metadata:
   name: openai-catchall-rt
   namespace: ai-gateway-ws-config
+  labels:
+    llm-type: openai
+    prompt-template: "none"
 spec:
   http:
     - name: catch-all

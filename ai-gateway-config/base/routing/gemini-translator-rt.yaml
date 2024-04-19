@@ -3,11 +3,12 @@ kind: RouteTable
 metadata:
   name: gemini-language-transformer-rt
   namespace: ai-gateway-ws-config
+  labels:
+    llm-type: gemini
+    prompt-template: "gemini-translator"
 spec:
   http:
     - name: language-translator
-      labels:
-        prompt-template: gemini-translator
       matchers:
       - uri:
           prefix: /gemini

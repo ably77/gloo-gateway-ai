@@ -19,63 +19,90 @@ spec:
       prompt-template: "eli5"
       security: openai
     delegate:
-      # Selects tables based on name
       routeTables:
-        - name: openai-eli5-rt
-          namespace: ai-gateway-ws-config
-      # Delegates based on order of weights
+        # Selects tables based on name
+        #- name: openai-eli5-rt
+        #  namespace: ai-gateway-ws-config
+        # Selects tables based on labels
+        - labels:
+            llm-type: openai
+            prompt-template: "eli5"
       sortMethod: ROUTE_SPECIFICITY
   - name: openai-translator
     labels:
       prompt-template: "translator"
       security: openai
     delegate:
-      # Selects tables based on name
       routeTables:
-        - name: openai-language-transformer-rt
-          namespace: ai-gateway-ws-config
-      # Delegates based on order of weights
+        # Selects tables based on name
+        #- name: openai-language-transformer-rt
+        #  namespace: ai-gateway-ws-config
+        # Selects tables based on labels
+        - labels:
+            llm-type: openai
+            prompt-template: "translator"
       sortMethod: ROUTE_SPECIFICITY
   - name: openai-system-user-input
     labels:
       prompt-template: "system-user-input"
       security: openai
     delegate:
-      # Selects tables based on name
       routeTables:
-        - name: openai-system-user-input-rt
-          namespace: ai-gateway-ws-config
-      # Delegates based on order of weights
+        # Selects tables based on name
+        #- name: openai-system-user-input-rt
+        #  namespace: ai-gateway-ws-config
+        # Selects tables based on labels
+        - labels:
+            llm-type: openai
+            prompt-template: "system-user-input"
       sortMethod: ROUTE_SPECIFICITY
   - name: openai-catchall
     delegate:
-      # Selects tables based on name
       routeTables:
-        - name: openai-catchall-rt
-          namespace: ai-gateway-ws-config
-      # Delegates based on order of weights
+        # Selects tables based on name
+        #- name: openai-catchall-rt
+        #  namespace: ai-gateway-ws-config
+        # Selects tables based on labels
+        - labels:
+            llm-type: openai
+            prompt-template: "none"
       sortMethod: ROUTE_SPECIFICITY
   - name: gemini-eli5
+    labels:
+      prompt-template: gemini-eli5
+      llm-type: gemini
     delegate:
-      # Selects tables based on name
       routeTables:
-        - name: gemini-eli5-rt
-          namespace: ai-gateway-ws-config
-      # Delegates based on order of weights
+        # Selects tables based on name
+        #- name: gemini-eli5-rt
+        #  namespace: ai-gateway-ws-config
+        # Selects tables based on labels
+        - labels:
+            llm-type: gemini
+            prompt-template: "gemini-eli5"
       sortMethod: ROUTE_SPECIFICITY
   - name: gemini-translator
+    labels:
+      prompt-template: gemini-translator
     delegate:
-      # Selects tables based on name
       routeTables:
-        - name: gemini-language-transformer-rt
-          namespace: ai-gateway-ws-config
+        # Selects tables based on name
+        #- name: gemini-language-transformer-rt
+        #  namespace: ai-gateway-ws-config
+        # Selects tables based on labels
+        - labels:
+            llm-type: gemini
+            prompt-template: "gemini-translator"
       # Delegates based on order of weights
       sortMethod: ROUTE_SPECIFICITY
   - name: gemini-catchall
     delegate:
-      # Selects tables based on name
       routeTables:
-        - name: gemini-catchall-rt
-          namespace: ai-gateway-ws-config
-      # Delegates based on order of weights
+        # Selects tables based on name
+        #- name: gemini-catchall-rt
+        #  namespace: ai-gateway-ws-config
+        # Selects tables based on labels
+        - labels:
+            llm-type: gemini
+            prompt-template: "none"
       sortMethod: ROUTE_SPECIFICITY

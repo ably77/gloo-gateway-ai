@@ -3,6 +3,9 @@ kind: RouteTable
 metadata:
   name: gemini-catchall-rt
   namespace: ai-gateway-ws-config
+  labels:
+    llm-type: gemini
+    prompt-template: "none"
 spec:
   http:
   - name: catch-all

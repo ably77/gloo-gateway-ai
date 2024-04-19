@@ -3,11 +3,12 @@ kind: RouteTable
 metadata:
   name: openai-system-user-input-rt
   namespace: ai-gateway-ws-config
+  labels:
+    llm-type: openai
+    prompt-template: "system-user-input"
 spec:
   http:
     - name: system-user-input
-      labels:
-        prompt-template: system-user-input
       matchers:
       - uri:
           prefix: /openai
