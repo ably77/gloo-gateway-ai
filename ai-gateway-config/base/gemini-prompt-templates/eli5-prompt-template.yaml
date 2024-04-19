@@ -1,0 +1,48 @@
+apiVersion: trafficcontrol.policy.gloo.solo.io/v2
+kind: TransformationPolicy
+metadata:
+  name: gemini-eli5-template-transformation
+  namespace: ai-gateway-ws-config
+spec:
+  applyToRoutes:
+  - route:
+      labels:
+        prompt-template: "gemini-eli5"
+  config:
+    request:
+      injaTemplate:
+        body:
+          text: |
+            {
+              "contents": [
+                {
+                  "role": "user",
+                  "parts": [
+                    {
+                      "text": "Explain like you are 5 years old"
+                    }
+                  ]
+                },
+                {
+                  "role": "model",
+                  "parts": [
+                    {
+                      "text": "Sure I can explain any topic to you as if you were 5 years old, what would you like me to explain?"
+                    }
+                  ]
+                },
+                {
+                  "role": "user",
+                  "parts": [
+                    {
+                      "text": "{{ prompt }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        extractors:
+          # extracts x-prompt header for body input
+          prompt:
+            header: 'x-prompt'
+            regex: '.*'

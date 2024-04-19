@@ -1,0 +1,78 @@
+apiVersion: networking.gloo.solo.io/v2
+kind: RouteTable
+metadata:
+  name: ai-gateway-root
+  namespace: ai-gateway-ws-config
+spec:
+  hosts:
+    - 'ai-gateway.demo.glooplatform.com'
+    - 'api.openai.com'
+    - 'generativelanguage.googleapis.com'
+  virtualGateways:
+    - name: mgmt-north-south-gw-443
+      namespace: istio-gateways
+      cluster: mgmt
+  workloadSelectors: []
+  http:
+  - name: openai-eli5
+    labels:
+      prompt-template: "eli5"
+    delegate:
+      # Selects tables based on name
+      routeTables:
+        - name: openai-eli5-rt
+          namespace: ai-gateway-ws-config
+      # Delegates based on order of weights
+      sortMethod: ROUTE_SPECIFICITY
+  - name: openai-translator
+    labels:
+      prompt-template: "translator"
+    delegate:
+      # Selects tables based on name
+      routeTables:
+        - name: openai-language-transformer-rt
+          namespace: ai-gateway-ws-config
+      # Delegates based on order of weights
+      sortMethod: ROUTE_SPECIFICITY
+  - name: openai-system-user-input
+    labels:
+      prompt-template: "system-user-input"
+    delegate:
+      # Selects tables based on name
+      routeTables:
+        - name: openai-system-user-input-rt
+          namespace: ai-gateway-ws-config
+      # Delegates based on order of weights
+      sortMethod: ROUTE_SPECIFICITY
+  - name: openai-catchall
+    delegate:
+      # Selects tables based on name
+      routeTables:
+        - name: openai-catchall-rt
+          namespace: ai-gateway-ws-config
+      # Delegates based on order of weights
+      sortMethod: ROUTE_SPECIFICITY
+  - name: gemini-eli5
+    delegate:
+      # Selects tables based on name
+      routeTables:
+        - name: gemini-eli5-rt
+          namespace: ai-gateway-ws-config
+      # Delegates based on order of weights
+      sortMethod: ROUTE_SPECIFICITY
+  - name: gemini-translator
+    delegate:
+      # Selects tables based on name
+      routeTables:
+        - name: gemini-language-transformer-rt
+          namespace: ai-gateway-ws-config
+      # Delegates based on order of weights
+      sortMethod: ROUTE_SPECIFICITY
+  - name: gemini-catchall
+    delegate:
+      # Selects tables based on name
+      routeTables:
+        - name: gemini-catchall-rt
+          namespace: ai-gateway-ws-config
+      # Delegates based on order of weights
+      sortMethod: ROUTE_SPECIFICITY

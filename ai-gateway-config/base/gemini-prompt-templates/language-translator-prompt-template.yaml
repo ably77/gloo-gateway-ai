@@ -1,0 +1,52 @@
+apiVersion: trafficcontrol.policy.gloo.solo.io/v2
+kind: TransformationPolicy
+metadata:
+  name: gemini-language-translator-prompt-template
+  namespace: ai-gateway-ws-config
+spec:
+  applyToRoutes:
+  - route:
+      labels:
+        prompt-template: gemini-translator
+  config:
+    request:
+      injaTemplate:
+        body:
+          text: |
+            {
+              "contents": [
+                {
+                  "role": "user",
+                  "parts": [
+                    {
+                      "text": "Translate some text for me into {{ language }}"
+                    }
+                  ]
+                },
+                {
+                  "role": "model",
+                  "parts": [
+                    {
+                      "text": "Sure I can translate that for you into {{ language }}, what would you like me to translate?"
+                    }
+                  ]
+                },
+                {
+                  "role": "user",
+                  "parts": [
+                    {
+                      "text": " {{ prompt}}"
+                    }
+                  ]
+                }
+              ]
+            }
+        extractors:
+          # extracts x-language header for the system prompt input
+          language:
+            header: 'x-language'
+            regex: '.*'
+          # extracts x-prompt header for the user prompt input
+          prompt:
+            header: 'x-prompt'
+            regex: '.*'
