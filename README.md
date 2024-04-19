@@ -1527,7 +1527,7 @@ output:
 }
 ```
 
-### Security - Protect your AI Gateway using api-key ExtAuth
+### Security - Secure your gateway and mask your LLM API key(s) using custom headers
 
 Description: Protect your AI Gateway access by using an api-key ext auth policy. This will make it so that a user-defined api-key key:value will be used to secure the gateway. Additionally, we can use the `headersFromMetadataEntry` feature in the ExtAuthPolicy to extract the actual OpenAPI LLM api-key from a secret and inject it into the request on successful auth
 
