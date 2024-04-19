@@ -4,10 +4,8 @@ kind: Kustomization
 
 # list of resources to be Applied
 resources:
-- ai-gateway-workspace.yaml
-- ai-gateway-workspacesettings.yaml
-- ai-gateway-ws-config-ns.yaml
-#- openai-prompt-templates
-#- gemini-prompt-templates
+- mesh-admin
 - routing
 - policies
+- openai-prompt-templates
+- gemini-prompt-templates
