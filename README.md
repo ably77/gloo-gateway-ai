@@ -1362,7 +1362,7 @@ EOF
 
 Now you should be able to curl the `/gemini` endpoint with the `x-api-key` header instead of a query path parameter. Don't worry though, the conditional logic that we implemented allows the user to provide the API key using either method!
 ```bash
-curl -X POST "https://ai-gateway.demo.glooplatform.com/gemini" -H 'x-template: eli5' -H 'x-prompt: star wars' -H 'x-api-key: AIzaSyBUCojcwzn9UPUF2T93f3W7Ukx_iEOU0V4' -H 'Content-Type: application/json'
+curl -X POST "https://ai-gateway.demo.glooplatform.com/gemini" -H 'x-template: eli5' -H 'x-prompt: star wars' -H 'x-api-key: $GEMINI_API_KEY' -H 'Content-Type: application/json'
 ```
 
 #### Language Translator Gemini Prompt Template
@@ -1593,7 +1593,7 @@ EOF
 
 input:
 ```bash
-curl -X POST "https://ai-gateway.demo.glooplatform.com/gemini" -H 'x-template: translator' -H 'x-prompt: hello today i am here to speak about service mesh' -H 'x-language: thai' -H 'x-api-key: AIzaSyBUCojcwzn9UPUF2T93f3W7Ukx_iEOU0V4' -H 'Content-Type: application/json'
+curl -X POST "https://ai-gateway.demo.glooplatform.com/gemini" -H 'x-template: translator' -H 'x-prompt: hello today i am here to speak about service mesh' -H 'x-language: thai' -H 'x-api-key: $GEMINI_API_KEY' -H 'Content-Type: application/json'
 ```
 
 output:
