@@ -489,7 +489,7 @@ Delegations allow us to provide a separation of concerns across teams as well as
 ### Prompt Templates - Templatize your prompt format
 
 #### ELI5 OpenAI Prompt Template
-Description: Configure a Gloo Gateway Transformation Policy that manages inputs using custom headers, and transforms these inputs into templatized prompts. The following ELI5 template uses the `x-api-key`, `x-template`, and `x-prompt` headers to explain a topic like a 5 year old. Additionally, a user can specify an `x-model` and `x-temp` header in order to consume a different LLM model or set a different temperature for the response (default is set to gpt-3.5-turbo and 0.7 temperature if headers are not provided). Configure an additional delegate route for the ELI5 prompt template to configure the request to the LLM based on these specific headers.
+Description: Configure a Gloo Gateway Transformation Policy that manages inputs using custom headers, and transforms these inputs into templatized prompts. The following ELI5 template uses the `x-api-key`, `x-template`, and `x-prompt` headers to explain a topic like a 5 year old. Additionally, a user can specify an `x-model` and `x-temp` header in order to consume a different LLM model or set a different temperature for the response (default is set to gpt-3.5-turbo and 0.7 temperature if headers are not provided). Note that we have set the `"max_tokens": 100` to set an upper boundary the response output length as well. Configure an additional delegate route for the ELI5 prompt template to configure the request to the LLM based on these specific headers.
 
 ```bash
 kubectl apply -f- <<EOF
@@ -671,7 +671,7 @@ output:
 ```
 
 #### System-User OpenAI Input Prompt Template
-Description: Configure a Gloo Gateway Transformation Policy that manages inputs using custom headers, and transforms these inputs into templatized prompts. The following system-user input prompt template uses the `x-api-key`, `x-template`, `x-system-prompt`, `x-user-prompt` to take on a custom role and prompt. Additionally, a user can specify an `x-model` and `x-temp` header in order to consume a different LLM model or set a different temperature for the response (default is set to gpt-3.5-turbo and 0.7 temperature if headers are not provided). Configure an additional delegate route for the ELI5 prompt template to configure the request to the LLM based on these specific headers.
+Description: Configure a Gloo Gateway Transformation Policy that manages inputs using custom headers, and transforms these inputs into templatized prompts. The following system-user input prompt template uses the `x-api-key`, `x-template`, `x-system-prompt`, `x-user-prompt` to take on a custom role and prompt. Additionally, a user can specify an `x-model` and `x-temp` header in order to consume a different LLM model or set a different temperature for the response (default is set to gpt-3.5-turbo and 0.7 temperature if headers are not provided). Note that we have set the `"max_tokens": 100` to set an upper boundary the response output length as well. Configure an additional delegate route for the ELI5 prompt template to configure the request to the LLM based on these specific headers.
 
 ```bash
 kubectl apply -f- <<EOF
@@ -873,7 +873,7 @@ output:
 
 #### Language Translator OpenAI Prompt Template
 
-Description: Configure a Gloo Gateway Transformation Policy that manages inputs using custom headers, and transforms these inputs into templatized prompts. The following language translator prompt template uses the `x-api-key`, `x-language`, `x-prompt` to translate an input prompt into any language. Additionally, a user can specify an `x-model` and `x-temp` header in order to consume a different LLM model or set a different temperature for the response (default is set to gpt-3.5-turbo and 0.7 temperature if headers are not provided). Configure an additional delegate route for the ELI5 prompt template to configure the request to the LLM based on these specific headers.
+Description: Configure a Gloo Gateway Transformation Policy that manages inputs using custom headers, and transforms these inputs into templatized prompts. The following language translator prompt template uses the `x-api-key`, `x-language`, `x-prompt` to translate an input prompt into any language. Additionally, a user can specify an `x-model` and `x-temp` header in order to consume a different LLM model or set a different temperature for the response (default is set to gpt-3.5-turbo and 0.7 temperature if headers are not provided). Note that we have set the `"max_tokens": 100` to set an upper boundary the response output length as well. Configure an additional delegate route for the ELI5 prompt template to configure the request to the LLM based on these specific headers.
 
 ```bash
 kubectl apply -f- <<EOF
@@ -1091,7 +1091,7 @@ output:
 
 
 #### ELI5 Gemini Prompt Template
-Description: Configure a Gloo Gateway Transformation Policy that manages inputs using custom headers, and transforms these inputs into templatized prompts. The following ELI5 template uses the `x-template`, and `x-prompt` headers to explain a topic like a 5 year old. Configure an additional delegate route for the ELI5 prompt template to configure the request to the LLM based on these specific headers.
+Description: Configure a Gloo Gateway Transformation Policy that manages inputs using custom headers, and transforms these inputs into templatized prompts. The following ELI5 template uses the `x-template`, and `x-prompt` headers to explain a topic like a 5 year old. Additionally, a user can specify a `x-temp` header in order to set a different temperature for the response (default is set to 0.7 temperature). Note that we have set the `"maxOutputTokens": 250` to set an upper boundary the response output length as well. Configure an additional delegate route for the ELI5 prompt template to configure the request to the LLM based on these specific headers.
 
 ```bash
 kubectl apply -f- <<EOF
@@ -1136,12 +1136,20 @@ spec:
                     }
                   ]
                 }
-              ]
+              ],
+              "generation_config": {
+                "temperature": {% if header("x-temp") != "" %}{{ temperature }}{% else %}0.7{% endif %},
+                "maxOutputTokens": 250
+              }
             }
         extractors:
           # extracts x-prompt header for body input
           prompt:
             header: 'x-prompt'
+            regex: '.*'
+        # extracts x-temp header var
+          temperature:
+            header: 'x-temp'
             regex: '.*'
 EOF
 ```
@@ -1360,7 +1368,11 @@ spec:
                     }
                   ]
                 }
-              ]
+              ],
+              "generation_config": {
+                "temperature": {% if header("x-temp") != "" %}{{ temperature }}{% else %}0.7{% endif %},
+                "maxOutputTokens": 250
+              }
             }
         extractors:
           # extracts x-prompt header var
@@ -1375,6 +1387,10 @@ spec:
           original_path:
             header: ':path'
             regex: '.*'
+          # extracts x-temp header var
+          temperature:
+            header: 'x-temp'
+            regex: '.*'
 EOF
 ```
 
@@ -1385,7 +1401,7 @@ curl -X POST "https://ai-gateway.demo.glooplatform.com/gemini" -H 'x-template: e
 
 #### Language Translator Gemini Prompt Template
 
-Description: Configure a Gloo Gateway Transformation Policy that manages inputs using custom headers, and transforms these inputs into templatized prompts. The following Gemini language translator prompt template uses the `x-template`, `x-language`, and `x-prompt` to translate an input prompt into any language. Configure an additional delegate route for the ELI5 prompt template to configure the request to the LLM based on these specific headers.
+Description: Configure a Gloo Gateway Transformation Policy that manages inputs using custom headers, and transforms these inputs into templatized prompts. The following Gemini language translator prompt template uses the `x-template`, `x-language`, and `x-prompt` to translate an input prompt into any language. Additionally, a user can specify a `x-temp` header in order to set a different temperature for the response (default is set to 0.7 temperature). Note that we have set the `"maxOutputTokens": 250` to set an upper boundary the response output length as well. Configure an additional delegate route for the ELI5 prompt template to configure the request to the LLM based on these specific headers.
 
 ```bash
 kubectl apply -f- <<EOF
@@ -1435,7 +1451,11 @@ spec:
                     }
                   ]
                 }
-              ]
+              ],
+              "generation_config": {
+                "temperature": {% if header("x-temp") != "" %}{{ temperature }}{% else %}0.7{% endif %},
+                "maxOutputTokens": 250
+              }
             }
         extractors:
           # extracts x-language header var
@@ -1453,6 +1473,10 @@ spec:
           # extracts pseudo-path header var
           original_path:
             header: ':path'
+            regex: '.*'
+          # extracts x-temp header var
+          temperature:
+            header: 'x-temp'
             regex: '.*'
 EOF
 ```

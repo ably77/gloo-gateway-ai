@@ -44,7 +44,11 @@ spec:
                     }
                   ]
                 }
-              ]
+              ],
+              "generation_config": {
+                "temperature": {% if header("x-temp") != "" %}{{ temperature }}{% else %}0.7{% endif %},
+                "maxOutputTokens": 250
+              }
             }
         extractors:
           # extracts x-language header var
@@ -62,4 +66,8 @@ spec:
           # extracts pseudo-path header var
           original_path:
             header: ':path'
+            regex: '.*'
+          # extracts x-temp header var
+          temperature:
+            header: 'x-temp'
             regex: '.*'
