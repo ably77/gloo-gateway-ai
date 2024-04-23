@@ -28,7 +28,9 @@ spec:
                   "role": "user",
                   "content": "{{ user_prompt }}"
                 }
-              ]
+              ],
+              "temperature": {% if header("x-temp") != "" %}{{ temperature }}{% else %}0.7{% endif %},
+              "max_tokens": 100
             }
         extractors:
           # extracts an x-api-key header var
@@ -46,4 +48,8 @@ spec:
           # extracts x-system-prompt var
           user_prompt:
             header: 'x-user-prompt'
+            regex: '.*'
+          # extracts x-temp header var
+          temperature:
+            header: 'x-temp'
             regex: '.*'

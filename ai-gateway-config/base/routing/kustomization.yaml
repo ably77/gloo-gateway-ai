@@ -7,10 +7,12 @@ resources:
 - curl-ui-rt.yaml
 - ai-gateway-root-rt.yaml
 - gemini-catchall-rt.yaml
+- gemini-client-rt.yaml
 - gemini-externalservice.yaml
 - gemini-translator-rt.yaml
 - gemini-eli5-rt.yaml
 - openai-catchall-rt.yaml
+- openai-client-rt.yaml
 - openai-eli5-rt.yaml
 - openai-externalservice.yaml
 - openai-system-user-input-rt.yaml
