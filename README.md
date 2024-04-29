@@ -1,5 +1,7 @@
 # gloo-gateway-ai
 
+![llm-gateway-1](.images/llm-gateway-1.png)
+
 In this blog we will use Gloo Gateway to create an AI API Gateway
 - AI Proxy - Unified endpoint for all apps, regardless of backend LLM
 - LLM Delegation - Separate LLM Routes by functionality and groups
